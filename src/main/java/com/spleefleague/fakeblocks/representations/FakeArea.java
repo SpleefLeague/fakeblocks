@@ -6,7 +6,9 @@
 package com.spleefleague.fakeblocks.representations;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -82,5 +84,19 @@ public class FakeArea {
         }
         final FakeArea other = (FakeArea) obj;
         return uuid.equals(other.uuid);
+    }
+    
+    private static final Map<UUID, FakeArea> knownAreas = new HashMap<>();
+    
+    public static void registerFakeArea(UUID uuid, FakeArea area) {
+        knownAreas.put(uuid, area);
+    }
+    
+    public static FakeArea getFakeArea(UUID uuid) {
+        return knownAreas.get(uuid);
+    }
+    
+    public static boolean containsFakeArea(UUID uuid) {
+        return knownAreas.containsKey(uuid);
     }
 }
