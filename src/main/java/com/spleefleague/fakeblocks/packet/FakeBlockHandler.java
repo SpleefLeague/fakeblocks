@@ -41,12 +41,12 @@ public class FakeBlockHandler implements Listener {
     private FakeBlockHandler() {
         this.fakeBlockCache = new HashMap<>();
         this.fakeAreas = new HashMap<>();
-        this.initPacketListeners();
         this.mbchandler = MultiBlockChangeHandler.init();
         Bukkit.getOnlinePlayers().stream().filter(player -> !fakeAreas.containsKey(player.getUniqueId())).forEach(player -> {
             fakeAreas.put(player.getUniqueId(), new HashSet());
             fakeBlockCache.put(player.getUniqueId(), new FakeBlockCache());
         });
+        this.initPacketListeners();
     }
 
     /**

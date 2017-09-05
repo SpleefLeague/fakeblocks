@@ -44,6 +44,7 @@ public class MultiBlockChangeHandler implements Listener {
     
     public static MultiBlockChangeHandler init() {
         MultiBlockChangeHandler instance = new MultiBlockChangeHandler();
+        Bukkit.getPluginManager().registerEvents(instance, FakeBlocks.getInstance());
         return instance;
     }
 
