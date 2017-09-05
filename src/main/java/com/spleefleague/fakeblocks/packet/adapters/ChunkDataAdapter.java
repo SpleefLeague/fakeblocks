@@ -9,7 +9,7 @@ import com.spleefleague.fakeblocks.FakeBlocks;
 import com.spleefleague.fakeblocks.chunk.ChunkPacketUtil;
 import com.spleefleague.fakeblocks.chunk.MultiBlockChangeHandler;
 import com.spleefleague.fakeblocks.packet.FakeBlockHandler;
-import com.spleefleague.fakeblocks.representations.FakeBlock;
+import com.spleefleague.fakeblocks.packet.FakeBlock;
 import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;

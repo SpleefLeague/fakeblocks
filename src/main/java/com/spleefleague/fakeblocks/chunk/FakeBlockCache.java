@@ -5,8 +5,8 @@
  */
 package com.spleefleague.fakeblocks.chunk;
 
-import com.spleefleague.fakeblocks.representations.FakeArea;
-import com.spleefleague.fakeblocks.representations.FakeBlock;
+import com.spleefleague.fakeblocks.packet.FakeArea;
+import com.spleefleague.fakeblocks.packet.FakeBlock;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;

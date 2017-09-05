@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.spleefleague.fakeblocks.representations;
+package com.spleefleague.fakeblocks.packet;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,6 +21,7 @@ public class FakeBlock extends FakeArea {
     private final int chunkx, chunkz;
     private Material material;
     private byte data;
+    private boolean modified = true;
     
     public FakeBlock(Location location, Material material) {
         this(location, material, (byte)0);
@@ -33,6 +34,14 @@ public class FakeBlock extends FakeArea {
         chunkx = chunk.getX();
         chunkz = chunk.getZ();
         this.data = data;
+    }
+    
+    protected boolean isModified() {
+        return modified;
+    }
+    
+    protected void setSaved() {
+        modified = false;
     }
 
     public Location getLocation() {
@@ -56,7 +65,10 @@ public class FakeBlock extends FakeArea {
     }
 
     public void setType(Material material) {
-        this.material = material;
+        if(this.material != material) {
+            this.material = material;
+            this.modified = false;
+        }
     }
 
     public int getX() {
@@ -76,7 +88,10 @@ public class FakeBlock extends FakeArea {
     }
     
     public void setDamageValue(byte data) {
-        this.data = data;
+        if(this.data != data) {
+            this.modified = false;
+            this.data = data;
+        }
     }
 
     @Override

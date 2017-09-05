@@ -5,7 +5,7 @@ import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.comphenix.protocol.wrappers.MultiBlockChangeInfo;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 import com.spleefleague.fakeblocks.FakeBlocks;
-import com.spleefleague.fakeblocks.representations.FakeBlock;
+import com.spleefleague.fakeblocks.packet.FakeBlock;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;

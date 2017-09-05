@@ -9,8 +9,6 @@ import com.spleefleague.fakeblocks.packet.adapters.BlockBreakAdapter;
 import com.spleefleague.fakeblocks.packet.adapters.BlockPlaceAdapter;
 import com.spleefleague.fakeblocks.packet.adapters.ChunkDataAdapter;
 import com.spleefleague.fakeblocks.packet.adapters.UnloadChunkAdapter;
-import com.spleefleague.fakeblocks.representations.FakeArea;
-import com.spleefleague.fakeblocks.representations.FakeBlock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -165,6 +163,11 @@ public class FakeBlockHandler implements Listener {
     }
 
     public void update(FakeArea area) {
+        Collection<FakeBlock> changed = new HashSet<>(area.getBlocks());
+        changed.removeIf(fb -> !fb.isModified());
+        if(changed.isEmpty()) {
+            return;
+        }
         HashSet<Player> players = new HashSet<>();
         for (Map.Entry<UUID, Set<FakeArea>> entry : fakeAreas.entrySet()) {
             Player player;
@@ -173,7 +176,8 @@ public class FakeBlockHandler implements Listener {
             }
             players.add(player);
         }
-        mbchandler.changeBlocks(area.getBlocks().toArray(new FakeBlock[0]), players.toArray(new Player[players.size()]));
+        mbchandler.changeBlocks(changed.toArray(new FakeBlock[0]), players.toArray(new Player[0]));
+        changed.forEach(fb -> fb.setSaved());
     }
 
     public void stop() {
