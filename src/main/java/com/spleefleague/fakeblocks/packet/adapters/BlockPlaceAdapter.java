@@ -7,7 +7,7 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import com.spleefleague.fakeblocks.FakeBlocks;
 import com.spleefleague.fakeblocks.packet.FakeBlockHandler;
-import com.spleefleague.fakeblocks.representations.FakeBlock;
+import com.spleefleague.fakeblocks.packet.FakeBlock;
 import java.util.Set;
 import org.bukkit.Location;
 

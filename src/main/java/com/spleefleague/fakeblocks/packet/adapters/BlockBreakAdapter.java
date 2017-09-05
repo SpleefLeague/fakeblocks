@@ -9,7 +9,7 @@ import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.spleefleague.fakeblocks.FakeBlocks;
 import com.spleefleague.fakeblocks.events.FakeBlockBreakEvent;
 import com.spleefleague.fakeblocks.packet.FakeBlockHandler;
-import com.spleefleague.fakeblocks.representations.FakeBlock;
+import com.spleefleague.fakeblocks.packet.FakeBlock;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;

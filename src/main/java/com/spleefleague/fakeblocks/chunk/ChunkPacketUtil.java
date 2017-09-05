@@ -6,7 +6,7 @@ import com.spleefleague.fakeblocks.chunk.BlockData;
 import com.spleefleague.fakeblocks.chunk.BlockPalette;
 import com.spleefleague.fakeblocks.chunk.ChunkData;
 import com.spleefleague.fakeblocks.chunk.ChunkSection;
-import com.spleefleague.fakeblocks.representations.FakeBlock;
+import com.spleefleague.fakeblocks.packet.FakeBlock;
 import com.spleefleague.fakeblocks.util.ByteBufferReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
