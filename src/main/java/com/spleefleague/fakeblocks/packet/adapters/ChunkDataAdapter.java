@@ -1,10 +1,11 @@
 package com.spleefleague.fakeblocks.packet.adapters;
 
-import com.comphenix.packetwrapper.WrapperPlayServerMapChunk;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.spleefleague.fakeblocks.FakeBlocks;
 import com.spleefleague.fakeblocks.chunk.ChunkPacketUtil;
 import com.spleefleague.fakeblocks.chunk.MultiBlockChangeHandler;
@@ -33,14 +34,19 @@ public class ChunkDataAdapter extends PacketAdapter {
     public void onPacketReceiving(PacketEvent event) {
     }
 
+    /**
+     * Play Server Map Chunk packet
+     * @param event Packet Event
+     */
     @Override
     public void onPacketSending(PacketEvent event) {
-        WrapperPlayServerMapChunk wpsmc = new WrapperPlayServerMapChunk(event.getPacket());
+        PacketContainer packetContainer = event.getPacket();
+        ChunkCoordIntPair chunkCoord = packetContainer.getChunkCoordIntPairs().read(0);
         Bukkit.getScheduler().runTask(FakeBlocks.getInstance(), () -> {
-            Chunk chunk = event.getPlayer().getWorld().getChunkAt(wpsmc.getChunkX(), wpsmc.getChunkZ());
+            Chunk chunk = event.getPlayer().getWorld().getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
             mbchandler.addChunk(event.getPlayer(), chunk);
         });
-        Set<FakeBlock> blocks = handler.getFakeBlocksForChunk(event.getPlayer(), wpsmc.getChunkX(), wpsmc.getChunkZ());
+        Set<FakeBlock> blocks = handler.getFakeBlocksForChunk(event.getPlayer(), chunkCoord.getChunkX(), chunkCoord.getChunkZ());
         if (blocks != null) {
             ChunkPacketUtil.setBlocksPacketMapChunk(event.getPlayer().getWorld(), event.getPacket(), blocks);
         }

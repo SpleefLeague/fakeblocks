@@ -1,9 +1,9 @@
 package com.spleefleague.fakeblocks.packet.adapters;
 
-import com.comphenix.packetwrapper.WrapperPlayClientBlockDig;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.spleefleague.fakeblocks.FakeBlocks;
@@ -16,17 +16,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.minecraft.server.v1_12_R1.EntityPlayer;
-import net.minecraft.server.v1_12_R1.Packet;
-import net.minecraft.server.v1_12_R1.PacketPlayOutWorldEvent;
-import net.minecraft.server.v1_12_R1.SoundEffectType;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_12_R1.util.CraftMagicNumbers;
+import net.minecraft.server.v1_15_R1.Block;
+import net.minecraft.server.v1_15_R1.IBlockData;
+import net.minecraft.server.v1_15_R1.SoundEffect;
+import net.minecraft.server.v1_15_R1.SoundEffectType;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 
@@ -48,12 +49,12 @@ public class BlockBreakAdapter extends PacketAdapter {
 
     @Override
     public void onPacketReceiving(PacketEvent event) {
-        WrapperPlayClientBlockDig wrapper = new WrapperPlayClientBlockDig(event.getPacket());
-        if (wrapper.getStatus() != EnumWrappers.PlayerDigType.START_DESTROY_BLOCK && wrapper.getStatus() != EnumWrappers.PlayerDigType.ABORT_DESTROY_BLOCK && wrapper.getStatus() != EnumWrappers.PlayerDigType.STOP_DESTROY_BLOCK) {
+        PacketContainer packetContainer = event.getPacket();
+        if (packetContainer.getPlayerDigTypes().read(0) != EnumWrappers.PlayerDigType.START_DESTROY_BLOCK && packetContainer.getPlayerDigTypes().read(0) != EnumWrappers.PlayerDigType.ABORT_DESTROY_BLOCK && packetContainer.getPlayerDigTypes().read(0) != EnumWrappers.PlayerDigType.STOP_DESTROY_BLOCK) {
             return;
         }
-        if (event.getPlayer().getLocation().multiply(0.0).add(wrapper.getLocation().toVector()).getBlock().getType() == Material.AIR && (wrapper.getStatus() == EnumWrappers.PlayerDigType.STOP_DESTROY_BLOCK || wrapper.getStatus() == EnumWrappers.PlayerDigType.START_DESTROY_BLOCK)) {
-            Location loc = wrapper.getLocation().toVector().toLocation(event.getPlayer().getWorld());
+        if (event.getPlayer().getLocation().multiply(0.0).add(packetContainer.getBlockPositionModifier().read(0).toVector()).getBlock().getType() == Material.AIR && (packetContainer.getPlayerDigTypes().read(0) == EnumWrappers.PlayerDigType.STOP_DESTROY_BLOCK || packetContainer.getPlayerDigTypes().read(0) == EnumWrappers.PlayerDigType.START_DESTROY_BLOCK)) {
+            Location loc = packetContainer.getBlockPositionModifier().read(0).toVector().toLocation(event.getPlayer().getWorld());
             FakeBlock broken = null;
             Chunk chunk = loc.getChunk();
             Set<FakeBlock> fakeBlocks = handler.getFakeBlocksForChunk(event.getPlayer(), chunk.getX(), chunk.getZ());
@@ -66,7 +67,7 @@ public class BlockBreakAdapter extends PacketAdapter {
                 }
             }
             if (broken != null) {
-                if (wrapper.getStatus() == EnumWrappers.PlayerDigType.STOP_DESTROY_BLOCK || broken.getType() == Material.SNOW_BLOCK && event.getPlayer().getItemInHand() != null && event.getPlayer().getItemInHand().getType() == Material.DIAMOND_SPADE || event.getPlayer().getGameMode() == GameMode.CREATIVE) {
+                if (packetContainer.getPlayerDigTypes().read(0) == EnumWrappers.PlayerDigType.STOP_DESTROY_BLOCK || broken.getType() == Material.SNOW_BLOCK && event.getPlayer().getItemInHand() != null && event.getPlayer().getInventory().getItemInMainHand().getType() == Material.DIAMOND_SHOVEL || event.getPlayer().getGameMode() == GameMode.CREATIVE) {
                     FakeBlockBreakEvent fbbe = new FakeBlockBreakEvent(broken, event.getPlayer());
                     Bukkit.getPluginManager().callEvent((Event) fbbe);
                     if (fbbe.isCancelled()) {
@@ -96,14 +97,18 @@ public class BlockBreakAdapter extends PacketAdapter {
     }
 
     private void sendBreakParticles(Player p, FakeBlock block) {
-        PacketPlayOutWorldEvent packet = new PacketPlayOutWorldEvent(2001, new net.minecraft.server.v1_12_R1.BlockPosition(block.getX(), block.getY(), block.getZ()), 80, false);
+        p.spawnParticle(Particle.BLOCK_DUST, block.getLocation(), 80);
+        /*
+        PacketPlayOutWorldEvent packet = new PacketPlayOutWorldEvent(2001, 
+                new net.minecraft.server.v1_12_R1.BlockPosition(block.getX(), block.getY(), block.getZ()), 80, false);
         ((CraftPlayer) p).getHandle().playerConnection.sendPacket((Packet) packet);
+        */
     }
 
     private void sendBreakSound(Player p, FakeBlock b) {
-        EntityPlayer entity = ((CraftPlayer) p).getHandle();
         SoundEffectType effectType = breakSounds.get(b.getType());
-        entity.a(effectType.d(), effectType.a() * 0.15f, effectType.b());
+        System.out.println("Sending block sound " + effectType);
+        p.playSound(b.getLocation(), effectType.d().toString(), effectType.a() * 0.15f, effectType.b());
     }
 
     private boolean blockEqual(Location loc1, Location loc2) {
@@ -115,12 +120,13 @@ public class BlockBreakAdapter extends PacketAdapter {
 
     private Map<Material, SoundEffectType> generateBreakSounds() {
         Map<Material, SoundEffectType> breakSounds = new HashMap<>();
-        for (net.minecraft.server.v1_12_R1.Block block : net.minecraft.server.v1_12_R1.Block.REGISTRY) {
+        for (IBlockData blockData : Block.REGISTRY_ID) {
             try {
-                Field effectField = net.minecraft.server.v1_12_R1.Block.class.getDeclaredField("stepSound");
+                Block block = blockData.getBlock();
+                Field effectField = Block.class.getDeclaredField("stepSound");
                 effectField.setAccessible(true);
                 SoundEffectType effectType = (SoundEffectType) effectField.get((Object) block);
-                breakSounds.put(CraftMagicNumbers.getMaterial((net.minecraft.server.v1_12_R1.Block) block), effectType);
+                breakSounds.put(CraftMagicNumbers.getMaterial((Block) block), effectType);
             } catch (IllegalAccessException | IllegalArgumentException | NoSuchFieldException | SecurityException ex) {
                 Logger.getLogger(FakeBlockHandler.class.getName()).log(Level.SEVERE, null, ex);
             }

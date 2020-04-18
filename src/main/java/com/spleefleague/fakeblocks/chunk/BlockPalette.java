@@ -39,16 +39,18 @@ public abstract class BlockPalette {
         }
     }
     
+    @Deprecated
     private static class GlobalBlockPalette extends BlockPalette {
 
         @Override
+        @Deprecated
         public BlockData[] decode(byte[] data) {
             ProtocolLongArrayBitReader reader = new ProtocolLongArrayBitReader(data);
             BlockData[] bdata = new BlockData[4096];//Chunk section is 16x16x16
             for (int i = 0; i < bdata.length; i++) {
                 byte damage = reader.readByte(4);
                 int id = reader.readInt(9);
-                bdata[i] = new BlockData(Material.getMaterial(id), damage);
+                //bdata[i] = new BlockData(Material.getMaterial(id), damage);
             }
             return bdata;
         }
@@ -109,7 +111,7 @@ public abstract class BlockPalette {
             for(int i = 0; i < data.length; i++) {
                 byte damage = (byte) (data[i] & 0xF);
                 int id = data[i] >> 4;
-                lookupTable[i] = new BlockData(Material.getMaterial(id), damage);
+                //lookupTable[i] = new BlockData(Material.getMaterial(id), damage);
             }
             return lookupTable;
         }

@@ -1,7 +1,9 @@
 package com.spleefleague.fakeblocks.chunk;
 
-import com.comphenix.packetwrapper.WrapperPlayServerMapChunk;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
+import com.spleefleague.fakeblocks.FakeBlocks;
 import com.spleefleague.fakeblocks.chunk.BlockData;
 import com.spleefleague.fakeblocks.chunk.BlockPalette;
 import com.spleefleague.fakeblocks.chunk.ChunkData;
@@ -19,7 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.minecraft.server.v1_12_R1.PacketPlayOutMapChunk;
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 
@@ -29,9 +31,10 @@ import org.bukkit.World.Environment;
  */
 public class ChunkPacketUtil {
     
+    @Deprecated
     public static void setBlocksPacketMapChunk(World world, PacketContainer packetContainer, Collection<FakeBlock> unverified) {
-        if (packetContainer.getHandle() instanceof PacketPlayOutMapChunk) {
-            PacketPlayOutMapChunk packet = (PacketPlayOutMapChunk) packetContainer.getHandle();
+        if (packetContainer.getType().equals(PacketType.Play.Server.MAP_CHUNK)) {
+                /*
             WrapperPlayServerMapChunk wpsmc = new WrapperPlayServerMapChunk(packetContainer);
             int x = wpsmc.getChunkX();
             int z = wpsmc.getChunkZ();
@@ -61,6 +64,7 @@ public class ChunkPacketUtil {
                     Logger.getLogger(ChunkPacketUtil.class.getName()).log(Level.SEVERE, "Debug info: ({0}|{1})", new Object[]{x, z});
                 }
             }
+                */
         }
     }
 

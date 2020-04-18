@@ -1,10 +1,11 @@
 package com.spleefleague.fakeblocks.packet.adapters;
 
-import com.comphenix.packetwrapper.WrapperPlayClientUseItem;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.spleefleague.fakeblocks.FakeBlocks;
 import com.spleefleague.fakeblocks.packet.FakeBlockHandler;
 import com.spleefleague.fakeblocks.packet.FakeBlock;
@@ -26,20 +27,22 @@ public class BlockPlaceAdapter extends PacketAdapter {
 
     @Override
     public void onPacketReceiving(PacketEvent event) {
+        PacketContainer packetContainer = event.getPacket();
+        /*
         WrapperPlayClientUseItem wrapper = new WrapperPlayClientUseItem(event.getPacket());
         if (wrapper.getLocation().getY() < 0) {
             return;
         }
-        Location loc = wrapper.getLocation().toVector().toLocation(event.getPlayer().getWorld());
-        int chunkX = wrapper.getLocation().getX() >> 4;
-        int chunkZ = wrapper.getLocation().getZ() >> 4;
-        Set<FakeBlock> fakeBlocks = handler.getFakeBlocksForChunk(event.getPlayer(), chunkX, chunkZ);
+        */
+        //Location loc = wrapper.getLocation().toVector().toLocation(event.getPlayer().getWorld());
+        ChunkCoordIntPair chunkCoord = packetContainer.getChunkCoordIntPairs().read(0);
+        Set<FakeBlock> fakeBlocks = handler.getFakeBlocksForChunk(event.getPlayer(), chunkCoord.getChunkX(), chunkCoord.getChunkZ());
         if (fakeBlocks != null) {
             for (FakeBlock fakeBlock : fakeBlocks) {
-                if (blockEqual(fakeBlock.getLocation(), loc)) {
+                //if (blockEqual(fakeBlock.getLocation(), loc)) {
                     event.setCancelled(true);
                     break;
-                }
+                //}
             }
         }
     }

@@ -1,10 +1,11 @@
 package com.spleefleague.fakeblocks.packet.adapters;
 
-import com.comphenix.packetwrapper.WrapperPlayServerUnloadChunk;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import com.comphenix.protocol.wrappers.ChunkCoordIntPair;
 import com.spleefleague.fakeblocks.FakeBlocks;
 import com.spleefleague.fakeblocks.chunk.MultiBlockChangeHandler;
 import com.spleefleague.fakeblocks.packet.FakeBlockHandler;
@@ -32,9 +33,10 @@ public class UnloadChunkAdapter extends PacketAdapter {
 
     @Override
     public void onPacketSending(PacketEvent event) {
-        WrapperPlayServerUnloadChunk wpsuc = new WrapperPlayServerUnloadChunk(event.getPacket());
+        PacketContainer packetContainer = event.getPacket();
+        ChunkCoordIntPair chunkCoord = packetContainer.getChunkCoordIntPairs().read(0);
         Bukkit.getScheduler().runTask(FakeBlocks.getInstance(), () -> {
-            Chunk chunk = event.getPlayer().getWorld().getChunkAt(wpsuc.getChunkX(), wpsuc.getChunkZ());
+            Chunk chunk = event.getPlayer().getWorld().getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
             mbchandler.removeChunk(event.getPlayer(), chunk);
         });
     }
